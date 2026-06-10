@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.arendaproga.data.Booking
 import com.example.arendaproga.data.Car
 import com.example.arendaproga.data.RoomRentRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -28,13 +29,19 @@ class RentViewModel(
     var isLoading by mutableStateOf(false)
         private set
 
-    // Кэш машин для быстрого getCar()
     private val carsCache = mutableMapOf<String, Car>()
 
     fun loadInitial() {
         viewModelScope.launch {
             isLoading = true
-            cars = repo.getCarsAsync()
+            var attempts = 0
+            var loaded = repo.getCarsAsync()
+            while (loaded.isEmpty() && attempts < 10) {
+                delay(200)
+                loaded = repo.getCarsAsync()
+                attempts++
+            }
+            cars = loaded
             cars.forEach { carsCache[it.id] = it }
             myBookings = repo.getBookingsAsync()
             favorites = repo.getFavoritesAsync()
@@ -48,22 +55,19 @@ class RentViewModel(
         return ok
     }
 
-    fun logout() {
-        isLoggedIn = false
-    }
+    fun logout() { isLoggedIn = false }
 
     fun getCar(id: String): Car? = carsCache[id]
 
     fun bookCar(car: Car, startDate: String, endDate: String, days: Int) {
         viewModelScope.launch {
-            val total = days.coerceAtLeast(1) * car.pricePerDay
             val booking = Booking(
                 id = UUID.randomUUID().toString(),
                 carId = car.id,
                 carTitle = "${car.brand} ${car.model} (${car.year})",
                 startDate = startDate,
                 endDate = endDate,
-                totalPrice = total,
+                totalPrice = days.coerceAtLeast(1) * car.pricePerDay,
                 status = "Pending"
             )
             repo.addBookingAsync(booking)

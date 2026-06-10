@@ -1,1 +1,13 @@
+# Built files
 /build
+
+# Local properties (contains API keys!)
+local.properties
+
+# Gradle
+.gradle/
+build/
+
+# Android Studio
+.idea/
+*.iml

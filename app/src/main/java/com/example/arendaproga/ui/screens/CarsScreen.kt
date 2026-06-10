@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.arendaproga.data.Car
 import com.example.arendaproga.ui.RentViewModel
+import com.example.arendaproga.ui.components.AiAssistantButton
 
 private enum class GearFilter { ALL, AT, MT }
 private enum class SortMode { PRICE_ASC, PRICE_DESC }
@@ -67,138 +68,139 @@ fun CarsScreen(
             .toList()
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF6F7FB))
-    ) {
-        // Header
-        Box(
+    Box(Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF1A1A2E), Color(0xFF0F3460))
-                    )
-                )
-                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .fillMaxSize()
+                .background(Color(0xFFF6F7FB))
         ) {
-            Column {
-                Text("Привет! 👋", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
-                Text("Выбери автомобиль", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
-        ) {
-
-            // Поиск
-            item {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = { query = it },
-                    placeholder = { Text("Поиск: Toyota, Kia...") },
-                    leadingIcon = { Text("🔍", fontSize = 18.sp) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF6C63FF),
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(Color(0xFF1A1A2E), Color(0xFF0F3460))
+                        )
                     )
-                )
-                Spacer(Modifier.height(14.dp))
-            }
-
-            // КПП фильтр
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(GearFilter.ALL to "Все", GearFilter.AT to "Автомат", GearFilter.MT to "Механика")
-                        .forEach { (g, label) ->
-                            GearChip(label = label, selected = gear == g, onClick = { gear = g })
-                        }
-                }
-                Spacer(Modifier.height(14.dp))
-            }
-
-            // Фильтр цены
-            item {
-                PriceBlock(priceRange = priceRange, onChange = { priceRange = it })
-                Spacer(Modifier.height(14.dp))
-            }
-
-            // Фильтр года
-            item {
-                YearBlock(yearRange = yearRange, onChange = { yearRange = it })
-                Spacer(Modifier.height(6.dp))
-            }
-
-            // Заголовок списка
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        "${filtered.size} авто",
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
-                        color = Color(0xFF1A1A2E)
-                    )
-                    SortDropdown(sort = sort, onChange = { sort = it })
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
+            ) {
+                Column {
+                    Text("Привет! 👋", color = Color.White.copy(alpha = 0.7f), fontSize = 14.sp)
+                    Text("Выбери автомобиль", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
-            if (filtered.isEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp)
+            ) {
                 item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(top = 60.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("🚫", fontSize = 48.sp)
-                            Spacer(Modifier.height(12.dp))
-                            Text("Ничего не найдено", fontWeight = FontWeight.Medium, color = Color.Gray)
-                        }
-                    }
-                }
-            } else {
-                items(filtered, key = { it.id }) { car ->
-                    CarCard(
-                        car = car,
-                        isFav = vm.isFavorite(car.id),
-                        onToggleFav = { vm.toggleFavorite(car.id) },
-                        onClick = { onOpenCar(car.id) }
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        placeholder = { Text("Поиск: Toyota, Kia...") },
+                        leadingIcon = { Text("🔍", fontSize = 18.sp) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF6C63FF),
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White
+                        )
                     )
                     Spacer(Modifier.height(14.dp))
                 }
+                item {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        listOf(GearFilter.ALL to "Все", GearFilter.AT to "Автомат", GearFilter.MT to "Механика")
+                            .forEach { (g, label) ->
+                                GearChip(label = label, selected = gear == g, onClick = { gear = g })
+                            }
+                    }
+                    Spacer(Modifier.height(14.dp))
+                }
+                item {
+                    PriceBlock(priceRange = priceRange, onChange = { priceRange = it })
+                    Spacer(Modifier.height(14.dp))
+                }
+                item {
+                    YearBlock(yearRange = yearRange, onChange = { yearRange = it })
+                    Spacer(Modifier.height(6.dp))
+                }
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "${filtered.size} авто",
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                            color = Color(0xFF1A1A2E)
+                        )
+                        SortDropdown(sort = sort, onChange = { sort = it })
+                    }
+                }
+                if (filtered.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 60.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("🚫", fontSize = 48.sp)
+                                Spacer(Modifier.height(12.dp))
+                                Text("Ничего не найдено", fontWeight = FontWeight.Medium, color = Color.Gray)
+                            }
+                        }
+                    }
+                } else {
+                    items(filtered, key = { it.id }) { car ->
+                        CarCard(
+                            car = car,
+                            isFav = vm.isFavorite(car.id),
+                            onToggleFav = { vm.toggleFavorite(car.id) },
+                            onClick = { onOpenCar(car.id) }
+                        )
+                        Spacer(Modifier.height(14.dp))
+                    }
+                }
             }
         }
+
+        AiAssistantButton(
+            screenContext = "Каталог автомобилей",
+            cars = vm.cars,
+            onOpenCar = onOpenCar
+        )
     }
-}
+} // ← конец CarsScreen
+
+// ─────────────────────────────────────────────
+// Вспомогательные компоненты — ВНЕ CarsScreen
+// ─────────────────────────────────────────────
 
 @Composable
 private fun GearChip(label: String, selected: Boolean, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(if (selected) Color(0xFF6C63FF) else Color.White)
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 10.dp)
+    Surface(
+        shape = RoundedCornerShape(20.dp),
+        color = if (selected) Color(0xFF6C63FF) else Color.White,
+        modifier = Modifier.clickable { onClick() }
     ) {
         Text(
-            label,
-            color = if (selected) Color.White else Color(0xFF555555),
+            text = label,
+            color = if (selected) Color.White else Color(0xFF1A1A2E),
             fontSize = 13.sp,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
         )
     }
 }
@@ -211,29 +213,63 @@ private fun PriceBlock(
 ) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(0.dp),
-        modifier = Modifier.fillMaxWidth()
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(Modifier.padding(16.dp)) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("💰 Цена в сутки", fontWeight = FontWeight.SemiBold, color = Color(0xFF1A1A2E))
+                Text("Цена / день", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Text(
-                    "${priceRange.start.toInt()} — ${priceRange.endInclusive.toInt()} ₸",
-                    color = Color(0xFF6C63FF),
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 13.sp
+                    "${priceRange.start.toInt()} – ${priceRange.endInclusive.toInt()} ₸",
+                    fontSize = 13.sp,
+                    color = Color(0xFF6C63FF)
                 )
             }
+            Spacer(Modifier.height(8.dp))
             RangeSlider(
                 value = priceRange,
                 onValueChange = onChange,
                 valueRange = MIN_PRICE..MAX_PRICE,
-                steps = 9,
-                modifier = Modifier.fillMaxWidth(),
+                colors = SliderDefaults.colors(
+                    thumbColor = Color(0xFF6C63FF),
+                    activeTrackColor = Color(0xFF6C63FF)
+                )
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun YearBlock(yearRange: IntRange, onChange: (IntRange) -> Unit) {
+    var start by remember(yearRange) { mutableStateOf(yearRange.first.toFloat()) }
+    var end by remember(yearRange) { mutableStateOf(yearRange.last.toFloat()) }
+
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("Год выпуска", fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text(
+                    "${start.toInt()} – ${end.toInt()}",
+                    fontSize = 13.sp,
+                    color = Color(0xFF6C63FF)
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            RangeSlider(
+                value = start..end,
+                onValueChange = { start = it.start; end = it.endInclusive },
+                onValueChangeFinished = { onChange(start.toInt()..end.toInt()) },
+                valueRange = MIN_YEAR.toFloat()..MAX_YEAR.toFloat(),
+                steps = (MAX_YEAR - MIN_YEAR - 1),
                 colors = SliderDefaults.colors(
                     thumbColor = Color(0xFF6C63FF),
                     activeTrackColor = Color(0xFF6C63FF)
@@ -244,71 +280,32 @@ private fun PriceBlock(
 }
 
 @Composable
-private fun YearBlock(yearRange: IntRange, onChange: (IntRange) -> Unit) {
-    Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(0.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(Modifier.padding(16.dp)) {
-            Text("📅 Год выпуска", fontWeight = FontWeight.SemiBold, color = Color(0xFF1A1A2E))
-            Spacer(Modifier.height(10.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                (MIN_YEAR..MAX_YEAR).forEach { year ->
-                    val selected = year in yearRange
-                    Box(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(if (selected) Color(0xFF6C63FF) else Color(0xFFF0F0F5))
-                            .clickable {
-                                val newRange = when {
-                                    year < yearRange.first -> year..yearRange.last
-                                    year > yearRange.last -> yearRange.first..year
-                                    year == yearRange.first && yearRange.first != yearRange.last -> (year + 1)..yearRange.last
-                                    year == yearRange.last && yearRange.first != yearRange.last -> yearRange.first..(year - 1)
-                                    else -> year..year
-                                }
-                                onChange(newRange)
-                            }
-                            .padding(horizontal = 14.dp, vertical = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            "$year",
-                            color = if (selected) Color.White else Color(0xFF555555),
-                            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-                            fontSize = 13.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
 private fun SortDropdown(sort: SortMode, onChange: (SortMode) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-        OutlinedTextField(
-            value = if (sort == SortMode.PRICE_ASC) "Цена ↑" else "Цена ↓",
-            onValueChange = {},
-            readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().widthIn(min = 130.dp),
+    val label = if (sort == SortMode.PRICE_ASC) "Цена ↑" else "Цена ↓"
+
+    Box {
+        Surface(
             shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF6C63FF),
-                unfocusedBorderColor = Color.Transparent,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White
+            color = Color.White,
+            modifier = Modifier.clickable { expanded = true }
+        ) {
+            Text(
+                label,
+                fontSize = 13.sp,
+                color = Color(0xFF6C63FF),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
             )
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            DropdownMenuItem(text = { Text("Цена ↑") }, onClick = { onChange(SortMode.PRICE_ASC); expanded = false })
-            DropdownMenuItem(text = { Text("Цена ↓") }, onClick = { onChange(SortMode.PRICE_DESC); expanded = false })
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text("Цена ↑") },
+                onClick = { onChange(SortMode.PRICE_ASC); expanded = false }
+            )
+            DropdownMenuItem(
+                text = { Text("Цена ↓") },
+                onClick = { onChange(SortMode.PRICE_DESC); expanded = false }
+            )
         }
     }
 }
@@ -321,97 +318,60 @@ private fun CarCard(
     onClick: () -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
     ) {
         Column {
             Box {
                 AsyncImage(
                     model = car.imageUrl,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().height(180.dp).clip(
-                        RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
-                    ),
-                    contentScale = ContentScale.Crop
-                )
-                // Градиент снизу фото
-                Box(
+                    contentDescription = "${car.brand} ${car.model}",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(80.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.45f))
-                            )
-                        )
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
                 )
-                // Цена поверх фото
-                Box(
+                IconButton(
+                    onClick = onToggleFav,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(8.dp)
+                ) {
+                    Text(if (isFav) "❤️" else "🤍", fontSize = 20.sp)
+                }
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = Color(0xFF6C63FF),
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .padding(12.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color(0xFF6C63FF))
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
-                    Text("${car.pricePerDay} ₸/сут", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                }
-                // Кнопка избранного
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(10.dp)
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
-                        .clickable { onToggleFav() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(if (isFav) "♥" else "♡", fontSize = 18.sp, color = if (isFav) Color(0xFFE040FB) else Color.Gray)
+                    Text(
+                        "${car.pricePerDay} ₸/день",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                    )
                 }
             }
-
-            Column(Modifier.padding(14.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(Modifier.weight(1f)) {
-                        Text(
-                            "${car.brand} ${car.model}",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 17.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            color = Color(0xFF1A1A2E)
-                        )
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            "${car.year} • ${car.transmission} • ${car.seats} мест",
-                            color = Color.Gray,
-                            fontSize = 13.sp
-                        )
-                    }
-                    // Рейтинг
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0xFFFFF8E1))
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Text("⭐", fontSize = 12.sp)
-                        Spacer(Modifier.width(3.dp))
-                        Text(
-                            "${car.rating}",
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color(0xFFFF8F00),
-                            fontSize = 13.sp
-                        )
-                    }
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    "${car.brand} ${car.model}",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 17.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = Color(0xFF1A1A2E)
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("📅 ${car.year}", fontSize = 13.sp, color = Color.Gray)
+                    Text("⚙️ ${car.transmission}", fontSize = 13.sp, color = Color.Gray)
                 }
             }
         }

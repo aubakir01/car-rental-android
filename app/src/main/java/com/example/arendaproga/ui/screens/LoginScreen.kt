@@ -139,7 +139,7 @@ fun LoginScreen(
                             val ok = vm.login(username, password)
                             if (ok) onLoginSuccess() else error = "Заполни логин и пароль"
                         },
-                        modifier = Modifier
+                          modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),

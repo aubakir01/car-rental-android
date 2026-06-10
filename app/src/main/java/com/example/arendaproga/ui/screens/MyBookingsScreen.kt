@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.arendaproga.data.Booking
 import com.example.arendaproga.ui.RentViewModel
+import com.example.arendaproga.ui.components.AiAssistantButton
 
 @Composable
 fun MyBookingsScreen(
@@ -25,47 +26,48 @@ fun MyBookingsScreen(
 ) {
     val list = vm.myBookings
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF6F7FB))
-    ) {
-        // Header
-        Box(
+    Box(Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    Brush.horizontalGradient(
-                        colors = listOf(Color(0xFF1A1A2E), Color(0xFF0F3460))
-                    )
-                )
-                .padding(horizontal = 20.dp, vertical = 20.dp)
+                .fillMaxSize()
+                .background(Color(0xFFF6F7FB))
         ) {
-            Text("Мои бронирования", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(Color(0xFF1A1A2E), Color(0xFF0F3460))
+                        )
+                    )
+                    .padding(horizontal = 20.dp, vertical = 20.dp)
+            ) {
+                Text("Мои бронирования", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+            }
 
-        if (list.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("📋", fontSize = 56.sp)
-                    Spacer(Modifier.height(16.dp))
-                    Text("Броней пока нет", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color(0xFF1A1A2E))
-                    Spacer(Modifier.height(6.dp))
-                    Text("Забронируй авто в каталоге", color = Color.Gray, fontSize = 14.sp)
+            if (list.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("📋", fontSize = 56.sp)
+                        Spacer(Modifier.height(16.dp))
+                        Text("Броней пока нет", fontWeight = FontWeight.SemiBold, fontSize = 18.sp, color = Color(0xFF1A1A2E))
+                        Spacer(Modifier.height(6.dp))
+                        Text("Забронируй авто в каталоге", color = Color.Gray, fontSize = 14.sp)
+                    }
+                }
+            } else {
+                LazyColumn(
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(list, key = { it.id }) { booking ->
+                        BookingCard(booking = booking, onCancel = { vm.cancelBooking(booking.id) })
+                    }
                 }
             }
-            return
         }
-
-        LazyColumn(
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(list, key = { it.id }) { booking ->
-                BookingCard(booking = booking, onCancel = { vm.cancelBooking(booking.id) })
-            }
-        }
+        AiAssistantButton(screenContext = "Мои бронирования")
     }
 }
 
@@ -82,7 +84,6 @@ private fun BookingCard(booking: Booking, onCancel: () -> Unit) {
         elevation = CardDefaults.cardElevation(if (isCancelled) 0.dp else 2.dp)
     ) {
         Column(Modifier.padding(18.dp)) {
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -96,9 +97,7 @@ private fun BookingCard(booking: Booking, onCancel: () -> Unit) {
                 ) {
                     Text(if (isCancelled) "❌" else "🚗", fontSize = 22.sp)
                 }
-
                 Spacer(Modifier.width(12.dp))
-
                 Column(Modifier.weight(1f)) {
                     Text(
                         booking.carTitle,
@@ -109,7 +108,6 @@ private fun BookingCard(booking: Booking, onCancel: () -> Unit) {
                     Spacer(Modifier.height(3.dp))
                     StatusBadge(status = booking.status)
                 }
-
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         "${booking.totalPrice} ₸",
@@ -121,7 +119,7 @@ private fun BookingCard(booking: Booking, onCancel: () -> Unit) {
             }
 
             Spacer(Modifier.height(14.dp))
-            Divider(color = Color(0xFFF0F0F0))
+            HorizontalDivider(color = Color(0xFFF0F0F0))
             Spacer(Modifier.height(12.dp))
 
             Row(

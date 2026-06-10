@@ -37,6 +37,8 @@ sealed class Route(val value: String) {
     object Cars : Route("cars")
     object Bookings : Route("bookings")
     object Profile : Route("profile")
+    object Api : Route("api_cars")
+    object Ocr : Route("ocr")
     object CarDetails : Route("car/{id}") {
         fun create(id: String) = "car/$id"
     }
@@ -82,6 +84,7 @@ class MainActivity : ComponentActivity() {
                             }
                         })
                     }
+                    composable(Route.Api.value) { CarNewsScreen(vm) }
                     composable(Route.Main.value) {
                         MainScaffold(vm = vm, onLogout = {
                             rootNav.navigate(Route.Login.value) {
@@ -102,7 +105,9 @@ private fun MainScaffold(vm: RentViewModel, onLogout: () -> Unit) {
         BottomItem(Route.Cars.value, "Каталог", "🚗"),
         BottomItem(Route.Favorites.value, "Избранное", "♡"),
         BottomItem(Route.Bookings.value, "Брони", "📋"),
+
         BottomItem(Route.Profile.value, "Профиль", "👤"),
+        BottomItem(Route.Ocr.value, "OCR", "📷"),
     )
 
     Scaffold(
@@ -138,8 +143,10 @@ private fun MainScaffold(vm: RentViewModel, onLogout: () -> Unit) {
         NavHost(navController = nav, startDestination = Route.Cars.value, modifier = Modifier.padding(padding)) {
             composable(Route.Cars.value) { CarsScreen(vm, { nav.navigate(Route.CarDetails.create(it)) }, { nav.navigate(Route.Bookings.value) }) }
             composable(Route.Bookings.value) { MyBookingsScreen(vm) }
+            composable(Route.Ocr.value) { OcrScreen() }
             composable(Route.Profile.value) { ProfileScreen(vm, onLogout) }
             composable(Route.Favorites.value) { FavoritesScreen(vm, { nav.navigate(Route.CarDetails.create(it)) }) }
+            composable(Route.Api.value) { CarNewsScreen(vm) }  // ← добавь эту строку
             composable(Route.CarDetails.value, arguments = listOf(navArgument("id") { type = NavType.StringType })) {
                 val id = it.arguments?.getString("id") ?: ""
                 CarDetailsScreen(vm, id, { nav.popBackStack() }, { nav.navigate(Route.BookingForm.create(id)) })

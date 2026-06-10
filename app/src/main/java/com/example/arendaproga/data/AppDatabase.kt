@@ -24,7 +24,8 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
+                lateinit var instance: AppDatabase
+                instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
                     "arendaproga.db"
@@ -32,9 +33,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            // Заполняем начальными данными при первом запуске
                             CoroutineScope(Dispatchers.IO).launch {
-                                INSTANCE?.dao()?.insertCars(initialCars)
+                                instance.dao().insertCars(initialCars)
                             }
                         }
                     })
@@ -46,7 +46,6 @@ abstract class AppDatabase : RoomDatabase() {
     }
 }
 
-// Начальные данные
 val initialCars = listOf(
     Car("1","Toyota","Camry",2020,18000,"AT",5,
         "https://cdn.imagin.studio/getimage?customer=img&make=toyota&modelFamily=camry&modelYear=2020&paintId=color-white&angle=01",4.8),
